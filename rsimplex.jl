@@ -8,7 +8,7 @@ actual LP problem
 author: Alireza Miraliakbar
 =#
 using LinearAlgebra
-function revised_simplex(A::Matrix, b::Vector, c::Vector, phase::String)
+function revised_simplex(A::Matrix, b::Vector, c::Vector, x_init::Vector,indx_B::Vector)
     #=
     Ax=b
     -------------------------------------------
@@ -18,29 +18,33 @@ function revised_simplex(A::Matrix, b::Vector, c::Vector, phase::String)
     =#
 
     m,n = size(A)
-    if phase == "phase I"
-        B_init = Matrix{Float64}(I, m,m)
-        x_B = b
-        c_bar = fill(0,(n,1))
-        c_B = fill(1,(n,1))
-        c_bar_nonbasic = - transpose(c_B) * A
-        c_bar_basic = fill(1,(n,1))
-        tableau = fill(0,(m,n+1))
-        tableau[0,1:]
-        while all(x -> x >= 0, c_bar)
-            
-        end
-    end
-    return c_bar
+    # building a tableau
+    tableau = fill(0,(m,n+1))
+    # selecting basic variables 
+    x_B = x_init[indx_Bd]
+    # selecting basic cost coeffs
+    c_B = c[indx_B]
+    tableau[1,1] = - c_B.* x_B
+
+    return tableau
 end
-# test
 
 # b = []
+
+A = [1 2 3 0; -1 2 6 0; 0 4 9 0; 0 0 3 1]
+b = [3 ;2; 5; 1]
+c =[1; 1; 1; 1]
+m, n = size(A)
 # # Phase I
-A= [1 2 3 0; -1 2 6 0; 0 4 9 0; 0 0 3 1]
-b = [2 ;3]
-c =[1; 1; 1]
-x_opt_p1 = revised_simplex(A, b, c, "phase I")
+A_p1 = hcat(A,I)
+# we will provide the initial solution to the simplex 
+basic_indx = [5,6,7,8]
+typeof(basic_indx)
+x_p1 = vcat([0; 0; 0; 0], b)
+# typeof(x_p1)
+cc = fill(0,(m,1))
+c_p1 = vcat(c, cc)
+x_opt_p1 = revised_simplex(A_p1, b, c_p1, x_p1, basic_indx)
 # # Phase II
 # A= [1 2 3 0; -1 2 6 0; 0 4 9 0; 0 0 3 1]
 # m, n = size(A)
