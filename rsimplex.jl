@@ -36,8 +36,17 @@ function revised_simplex(A, b, c, x_init,indx_B)
     tableau[2:m+1, 1] = transpose(x_B)
 
     tableau[2:m+1, 2:n+1] = A
+    x_opt = 1
+    while all(tableau[1,2:n+1] .<= 0)
+        neg_indx = findall(x -> x < 0, tableau[1,2:n+1])
+        # Dantzig's rule
+        pivot_indx = neg_indx[1]
+        u_j = A[:,pivot_indx - 1]
+        # println("u_j = $u_j")
+        
+    end
 
-    return tableau
+    return x_opt
 end
 
 # b = []
