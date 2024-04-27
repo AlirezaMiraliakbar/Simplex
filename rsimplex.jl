@@ -37,31 +37,48 @@ function revised_simplex(A, b, c, x_init,indx_B)
 
     tableau[2:m+1, 2:n+1] = A
     x_opt = 1
+
     while all(tableau[1,2:n+1] .<= 0)
         neg_indx = findall(x -> x < 0, tableau[1,2:n+1])
         # Dantzig's rule
         pivot_indx = neg_indx[1]
-        u_j = A[:,pivot_indx - 1]
-        # println("u_j = $u_j")
+        println("pivot_indx = $pivot_indx")
+        u_j = A[:,pivot_indx]
+        println("u_j = $u_j")
+        non_zero_indx = findall(x -> x > 0, u_j)
+        println("non_zero_indx = $non_zero_indx")
+        thetas = x_B[non_zero_indx] ./ u_j[non_zero_indx]
+        println("Theta = $thetas")
+        min_theta = minimum(thetas)
+        l = findall(x -> x == min_theta, thetas)[1]
+        println("l = $l")
+        # making reduced cost of j = 0 
+        c_j = tableau[1,2:n+1][pivot_indx]
+        println("c_j = $c_j")
+        tableau[1,1] += min_theta * c_j
+        tableau[1,pivot_indx+1] = 0
+
+        # make column A_[pivot_indx] into e_l
+        pivot_element = tableau[l+1,pivot_indx+1]
+        println("pivot element = $pivot_element")
         
+        break
     end
 
     return x_opt
 end
 
-# b = []
-
 A = [1 2 3 0; -1 2 6 0; 0 4 9 0; 0 0 3 1]
 b = [3 ;2; 5; 1]
 c =[1; 1; 1; 1]
 m, n = size(A)
-# # Phase I
+# Phase I
 A_p1 = hcat(A,I)
 
 # we will provide the initial solution to the simplex 
 
-basic_indx = [5,6,7,8]
-x_p1 = [0;0;0;0; 3; 2; 5; 1]
+basic_indx = [5, 6, 7, 8]
+x_p1 = [0; 0; 0; 0; 3; 2; 5; 1]
 cc = fill(0,(m,1))
 c_p1 = vcat(cc, c)
 x_opt_p1 = revised_simplex(A_p1, b, c_p1, x_p1, basic_indx)
